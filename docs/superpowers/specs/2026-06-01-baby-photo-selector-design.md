@@ -96,6 +96,31 @@
 | 曝光正常 | 20% | 像素亮度均值，过暗/过曝扣分 |
 | 人脸构图 | 15% | 人脸 bounding box 面积 / 图片面积 |
 
+### 评分权重配置化（轻量预留）
+权重值不写死在代码里，统一从配置对象读取，V1 用默认值，后续可通过改配置快速调参：
+
+```typescript
+// config/scoringConfig.ts
+export const DEFAULT_SCORING_CONFIG = {
+  weights: {
+    sharpness: 0.35,
+    babyProbability: 0.30,
+    exposure: 0.20,
+    composition: 0.15,
+  },
+  filters: {
+    minBabyProbability: 0.5,   // 低于此值直接过滤
+    burstWindowSeconds: 60,    // 连拍聚类时间窗口
+  },
+  output: {
+    defaultCount: 30,          // 默认输出张数
+    maxPerDay: 5,              // 同一天最多输出张数
+  },
+};
+```
+
+V1 不暴露给用户调整，但结构预留，方便开发阶段根据真实照片效果快速调参。
+
 ### 输出控制
 - 默认输出 **Top 30 张**，用户可在设置中调整（20 / 30 / 50）
 - 同一天内最多输出 **5 张**（避免某天拍了很多导致其他天没有）
