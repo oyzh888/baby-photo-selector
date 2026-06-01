@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "宝宝精选",
+    "slug": "baby-photo-selector",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "com.babyphotoselector.app",
+      "supportsTablet": false
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "宝宝精选需要访问您的相册，用于在本地分析并筛选宝宝照片。",
+          "savePhotosPermission": "宝宝精选需要将精选照片保存到您的相册。",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ]
+  }
+}
