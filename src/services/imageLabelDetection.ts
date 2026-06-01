@@ -11,9 +11,9 @@ const BABY_LABELS = ['baby', 'infant', 'toddler', 'child', 'newborn', 'kid'];
  */
 export async function detectBabyProbability(uri: string): Promise<number> {
   try {
-    const labels = await ImageLabeling.label(uri, {
-      confidenceThreshold: 0.3,
-    });
+    const allLabels = await ImageLabeling.label(uri);
+    // Filter to labels with confidence >= 0.3 (threshold the native API no longer accepts)
+    const labels = allLabels.filter(l => l.confidence >= 0.3);
 
     let maxConfidence = 0;
     for (const label of labels) {
