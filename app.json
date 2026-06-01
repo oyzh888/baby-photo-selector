@@ -3,6 +3,7 @@
     "name": "宝宝精选",
     "slug": "baby-photo-selector",
     "version": "1.0.0",
+    "owner": "oyzh888",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -19,6 +20,13 @@
         "NSPhotoLibraryAddUsageDescription": "宝宝精选需要将精选照片保存到您的相册。",
         "UIBackgroundModes": ["fetch", "processing"]
       }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFF9FB"
+      },
+      "package": "com.babyphotoselector.app"
     },
     "plugins": [
       [
