@@ -4,9 +4,21 @@
     "slug": "baby-photo-selector",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF9FB"
+    },
     "ios": {
       "bundleIdentifier": "com.babyphotoselector.app",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "宝宝精选需要访问您的相册，用于在本地分析并筛选宝宝照片。所有处理均在您的设备上完成，照片不会上传到任何服务器。",
+        "NSPhotoLibraryAddUsageDescription": "宝宝精选需要将精选照片保存到您的相册。",
+        "UIBackgroundModes": ["fetch", "processing"]
+      }
     },
     "plugins": [
       [
