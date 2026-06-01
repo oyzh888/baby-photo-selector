@@ -10,8 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "types": ["jest", "node"]
   },
-  "include": ["src", "__tests__"],
+  "include": ["src", "__tests__", "App.tsx"],
   "exclude": ["node_modules"]
 }
