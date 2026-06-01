@@ -37,6 +37,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Init EAS project (writes projectId into app.json)
+        run: eas init --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Build iOS with EAS
         run: |
           eas build \
@@ -52,4 +57,4 @@ jobs:
       - name: Build queued
         run: |
           echo "✅ iOS build queued on EAS!"
-          echo "Monitor at: https://expo.dev/accounts/oyzh888/projects/baby-photo-selector/builds"
+          echo "Monitor at: https://expo.dev/accounts/jackshuhui/projects/baby-photo-selector/builds"
