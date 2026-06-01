@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宝宝精选 Baby Photo Selector — 产品设计文档</title>
+  <style>
+    :root {
+      --primary: #FF6B9D;
+      --primary-light: #FFE4F0;
+      --primary-dark: #E84E84;
+      --secondary: #6C63FF;
+      --accent: #FFB347;
+      --bg: #FAFAFA;
+      --card: #FFFFFF;
+      --text: #2D3748;
+      --text-muted: #718096;
+      --border: #E2E8F0;
+      --code-bg: #F7FAFC;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --shadow-hover: 0 8px 30px rgba(255,107,157,0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Header ── */
+    .hero {
+      background: linear-gradient(135deg, #FF6B9D 0%, #FF8E53 50%, #FFB347 100%);
+      color: white;
+      padding: 60px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "👶📸";
+      font-size: 120px;
+      position: absolute;
+      top: -20px; right: -10px;
+      opacity: 0.12;
+      line-height: 1;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .hero .subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 20px; }
+    .hero .meta {
+      display: inline-flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50px; padding: 8px 24px; font-size: 0.9rem;
+    }
+    .hero .meta span { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Layout ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+    /* ── Section ── */
+    .section {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: box-shadow 0.2s;
+    }
+    .section:hover { box-shadow: var(--shadow-hover); }
+
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .section-icon {
+      width: 40px; height: 40px;
+      background: var(--primary-light);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 1.25rem; font-weight: 700; color: var(--primary-dark);
+    }
+    .section-num {
+      font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
+      background: var(--border); border-radius: 6px; padding: 2px 8px;
+    }
+
+    h3 {
+      font-size: 1rem; font-weight: 700; color: var(--secondary);
+      margin: 20px 0 10px;
+    }
+
+    p { margin-bottom: 12px; }
+
+    /* ── Cards grid for key values ── */
+    .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    .cards-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+    @media (max-width: 600px) { .cards-3, .cards-2 { grid-template-columns: 1fr; } }
+
+    .value-card {
+      background: var(--primary-light);
+      border-radius: 12px; padding: 20px;
+      border-left: 4px solid var(--primary);
+    }
+    .value-card .vc-icon { font-size: 24px; margin-bottom: 8px; }
+    .value-card .vc-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; color: var(--primary-dark); }
+    .value-card .vc-desc { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 12px; }
+    th {
+      background: var(--primary-light); color: var(--primary-dark);
+      font-weight: 700; padding: 10px 14px; text-align: left;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAFE; }
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child  { border-radius: 0 8px 0 0; }
+
+    /* ── Code block ── */
+    pre {
+      background: #1E2235; color: #e2e8f0;
+      border-radius: 12px; padding: 20px 24px;
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 0.82rem; line-height: 1.6;
+      overflow-x: auto; margin: 12px 0;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    code {
+      background: var(--code-bg); color: var(--primary-dark);
+      padding: 2px 6px; border-radius: 4px;
+      font-family: "Fira Code", Consolas, monospace; font-size: 0.88em;
+    }
+    pre code { background: transparent; color: inherit; padding: 0; }
+
+    /* ── Pipeline steps ── */
+    .pipeline { margin: 16px 0; }
+    .pipeline-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .pipeline-step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+    .step-content .step-title { font-weight: 700; font-size: 0.95rem; }
+    .step-content .step-desc  { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Score weights ── */
+    .weight-bar-wrap { margin-bottom: 12px; }
+    .weight-label { display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 4px; }
+    .weight-label .name { font-weight: 600; }
+    .weight-label .pct  { color: var(--primary-dark); font-weight: 700; }
+    .weight-bar {
+      height: 10px; background: var(--border); border-radius: 99px; overflow: hidden;
+    }
+    .weight-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 99px;
+    }
+
+    /* ── Page flow cards ── */
+    .page-flow { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+    .page-card {
+      flex: 1 1 160px;
+      border: 2px solid var(--border); border-radius: 14px; padding: 18px 16px;
+      text-align: center; transition: all 0.2s; cursor: default;
+    }
+    .page-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .page-card .pc-icon { font-size: 30px; margin-bottom: 8px; }
+    .page-card .pc-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+    .page-card .pc-en   { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── Milestone timeline ── */
+    .timeline { margin-top: 16px; }
+    .tl-item { display: flex; gap: 16px; margin-bottom: 16px; }
+    .tl-dot {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; font-size: 0.75rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .tl-body { flex: 1; }
+    .tl-title { font-weight: 700; font-size: 0.95rem; }
+    .tl-desc  { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+    .tl-time  {
+      font-size: 0.8rem; font-weight: 600;
+      background: var(--primary-light); color: var(--primary-dark);
+      border-radius: 6px; padding: 1px 8px; display: inline-block; margin-top: 4px;
+    }
+
+    /* ── Not in scope list ── */
+    .not-in-scope { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .scope-tag {
+      background: #FFF5F5; border: 1px solid #FED7D7; color: #C53030;
+      border-radius: 8px; padding: 6px 14px; font-size: 0.85rem; font-weight: 500;
+    }
+    .scope-tag::before { content: "✗ "; }
+
+    /* ── Tag chips ── */
+    .chip {
+      display: inline-block; background: var(--primary-light); color: var(--primary-dark);
+      border-radius: 6px; padding: 2px 10px; font-size: 0.82rem; font-weight: 600;
+      margin: 2px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 32px 20px;
+      font-size: 0.85rem; color: var(--text-muted);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <h1>👶 宝宝精选 · Baby Photo Selector</h1>
+  <div class="subtitle">产品设计文档 — 帮新手父母从海量照片中自动找出宝宝最美瞬间</div>
+  <div class="meta">
+    <span>📅 2026-06-01</span>
+    <span>🏷 V1.0 · MVP</span>
+    <span>🎯 iOS App Store</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══ 一、产品概述 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📱</div>
+      <div>
+        <div class="section-title">产品概述</div>
+        <span class="section-num">SECTION 01</span>
+      </div>
+    </div>
+
+    <p>一款帮助新手父母从海量手机照片中<strong>自动筛选出宝宝最佳照片</strong>的 iOS 工具 App。用户授权相册后，App 自动扫描最近 1000 张照片，通过本地 AI 识别宝宝照片并评分，挑出最好看的 20～50 张，支持手动微调后一键保存为系统相册中的「宝宝精选」文件夹。</p>
+
+    <h3>核心价值主张</h3>
+    <div class="cards-3">
+      <div class="value-card">
+        <div class="vc-icon">🔒</div>
+        <div class="vc-title">隐私安全</div>
+        <div class="vc-desc">全本地处理，照片不离开手机</div>
+      </div>
+      <div class="value-card">
+        <div class="vc-icon">⚡️</div>
+        <div class="vc-title">一键自动筛选</div>
+        <div class="vc-desc">无需手动翻看海量照片</div>
+      </div>
+      <div class="value-card">
+        <div class="vc-icon">✏️</div>
+        <div class="vc-title">结果可控</div>
+        <div class="vc-desc">误判可手动纠正，完全掌控</div>
+      </div>
+    </div>
+
+    <h3>商业模式</h3>
+    <p>
+      <span class="chip">🆓 免费下载</span>
+      <span class="chip">🚫 V1 无广告</span>
+      <span class="chip">💎 后续订阅解锁高级功能</span>
+    </p>
+  </div>
+
+  <!-- ══ 二、技术选型 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🔧</div>
+      <div>
+        <div class="section-title">技术选型</div>
+        <span class="section-num">SECTION 02</span>
+      </div>
+    </div>
+
+    <h3>开发框架</h3>
+    <p><strong>Expo（Bare Workflow）</strong>：快速开发，支持 OTA 更新，后续按需迁移 SwiftUI。目标平台 iOS 优先，代码结构预留 Android 扩展空间。</p>
+
+    <h3>核心依赖</h3>
+    <table>
+      <thead><tr><th>功能</th><th>库</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>相册访问</td><td><code>expo-media-library</code></td><td>封装 PhotoKit，支持全部 / 选中两种权限模式</td></tr>
+        <tr><td>人脸检测 + 年龄判断</td><td><code>@react-native-ml-kit/face-detection</code></td><td>Google ML Kit，本地运行，iOS/Android 通用</td></tr>
+        <tr><td>清晰度 / 曝光评分</td><td>JS 自研（图像统计）</td><td>基于缩略图像素分析，无原生依赖</td></tr>
+        <tr><td>重复照片去重</td><td>JS 自研（时间窗口聚类）</td><td>60 秒内连拍归为同组，取最高分</td></tr>
+        <tr><td>保存相册</td><td><code>expo-media-library</code></td><td>写入 PHAssetCollection「宝宝精选」</td></tr>
+      </tbody>
+    </table>
+
+    <h3>性能策略</h3>
+    <p>
+      <span class="chip">🖼 全程使用缩略图，不加载原图</span>
+      <span class="chip">🧵 后台线程扫描，主线程不卡顿</span>
+      <span class="chip">🔋 支持锁屏后台继续扫描（BackgroundFetch）</span>
+    </p>
+  </div>
+
+  <!-- ══ 三、系统架构 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🏗</div>
+      <div>
+        <div class="section-title">系统架构</div>
+        <span class="section-num">SECTION 03</span>
+      </div>
+    </div>
+    <pre>┌─────────────────────────────────────────┐
+│           Expo (Bare Workflow)           │
+├─────────────────┬───────────────────────┤
+│   UI Layer      │   Processing Layer     │
+│   (React Native)│                        │
+│                 │  expo-media-library    │
+│  - 首页          │  → 读取缩略图           │
+│  - 授权引导页    │  → 按时间倒序 1000 张   │
+│  - 扫描进度页    │                        │
+│  - 精选结果页    │  ML Kit Face Detection │
+│  - 完成页        │  → 人脸检测             │
+│                 │  → 年龄段（婴儿概率）   │
+│                 │                        │
+│                 │  JS Image Analyzer     │
+│                 │  → 清晰度（拉普拉斯方差）│
+│                 │  → 曝光（亮度均值）     │
+│                 │  → 构图（人脸占比）     │
+│                 │                        │
+│                 │  Burst Deduplicator    │
+│                 │  → 按时间窗口聚类       │
+│                 │  → 同组取最高分         │
+└─────────────────┴───────────────────────┘
+         ↓ 保存
+   PHAssetCollection「宝宝精选」</pre>
+  </div>
+
+  <!-- ══ 四、AI 评分算法 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🤖</div>
+      <div>
+        <div class="section-title">AI 评分算法（V1）</div>
+        <span class="section-num">SECTION 04</span>
+      </div>
+    </div>
+
+    <h3>筛选流水线</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">人脸检测</div>
+          <div class="step-desc">ML Kit 检测照片中的人脸 → 无人脸直接过滤</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">年龄段判断</div>
+          <div class="step-desc">判断是否为婴幼儿 → 婴儿概率 &lt; 0.5 过滤</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">综合评分</div>
+          <div class="step-desc">按四个维度加权计算每张照片得分</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">连拍去重</div>
+          <div class="step-desc">60 秒内连拍归为同组，同组保留最高分</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">输出 Top 结果</div>
+          <div class="step-desc">默认取 Top 30 张，同一天最多 5 张</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>综合评分权重（V1）</h3>
+    <div style="margin-top: 14px;">
+      <div class="weight-bar-wrap">
+        <div class="weight-label"><span class="name">🎯 人脸清晰度</span><span class="pct">35%</span></div>
+        <div class="weight-bar"><div class="weight-bar-fill" style="width:35%"></div></div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-label"><span class="name">👶 婴儿概率</span><span class="pct">30%</span></div>
+        <div class="weight-bar"><div class="weight-bar-fill" style="width:30%"></div></div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-label"><span class="name">☀️ 曝光正常</span><span class="pct">20%</span></div>
+        <div class="weight-bar"><div class="weight-bar-fill" style="width:20%"></div></div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-label"><span class="name">📐 人脸构图</span><span class="pct">15%</span></div>
+        <div class="weight-bar"><div class="weight-bar-fill" style="width:15%"></div></div>
+      </div>
+    </div>
+
+    <h3>评分权重配置（可扩展）</h3>
+    <pre><span style="color:#90CDF4">// config/scoringConfig.ts</span>
+<span style="color:#F6E05E">export const</span> DEFAULT_SCORING_CONFIG = {
+  weights: {
+    sharpness:       <span style="color:#68D391">0.35</span>,  <span style="color:#718096">// 清晰度</span>
+    babyProbability: <span style="color:#68D391">0.30</span>,  <span style="color:#718096">// 婴儿概率</span>
+    exposure:        <span style="color:#68D391">0.20</span>,  <span style="color:#718096">// 曝光</span>
+    composition:     <span style="color:#68D391">0.15</span>,  <span style="color:#718096">// 构图</span>
+  },
+  filters: {
+    minBabyProbability: <span style="color:#68D391">0.5</span>,  <span style="color:#718096">// 低于此值直接过滤</span>
+    burstWindowSeconds: <span style="color:#68D391">60</span>,   <span style="color:#718096">// 连拍聚类时间窗口</span>
+  },
+  output: {
+    defaultCount: <span style="color:#68D391">30</span>,   <span style="color:#718096">// 默认输出张数</span>
+    maxPerDay:     <span style="color:#68D391">5</span>,    <span style="color:#718096">// 同一天最多输出张数</span>
+  },
+};</pre>
+  </div>
+
+  <!-- ══ 五、页面设计 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🖼</div>
+      <div>
+        <div class="section-title">页面详细设计</div>
+        <span class="section-num">SECTION 05</span>
+      </div>
+    </div>
+
+    <div class="page-flow">
+      <div class="page-card">
+        <div class="pc-icon">🏠</div>
+        <div class="pc-name">首页</div>
+        <div class="pc-en">Home</div>
+      </div>
+      <div class="page-card">
+        <div class="pc-icon">🔑</div>
+        <div class="pc-name">授权引导页</div>
+        <div class="pc-en">Permission</div>
+      </div>
+      <div class="page-card">
+        <div class="pc-icon">⏳</div>
+        <div class="pc-name">扫描进度页</div>
+        <div class="pc-en">Scanning</div>
+      </div>
+      <div class="page-card">
+        <div class="pc-icon">✨</div>
+        <div class="pc-name">精选结果页</div>
+        <div class="pc-en">Results</div>
+      </div>
+      <div class="page-card">
+        <div class="pc-icon">🎉</div>
+        <div class="pc-name">完成页</div>
+        <div class="pc-en">Done</div>
+      </div>
+    </div>
+
+    <h3>🏠 首页（Home）</h3>
+    <p>App Logo + 标语「帮你从海量照片里找出宝宝最美的瞬间」+ 主按钮「开始扫描」。有历史结果时额外显示上次扫描时间和「查看上次结果」入口。</p>
+
+    <h3>🔑 授权引导页（Permission）</h3>
+    <p>强调本地处理与隐私安全，提供两种授权路径：</p>
+    <div class="cards-2">
+      <div class="value-card" style="border-left-color: var(--secondary);">
+        <div class="vc-title">✅ 允许访问全部照片</div>
+        <div class="vc-desc">自动扫描最近 1000 张</div>
+      </div>
+      <div class="value-card" style="border-left-color: var(--accent);">
+        <div class="vc-title">📂 只选择部分照片</div>
+        <div class="vc-desc">调起系统照片选择器，扫描选中的</div>
+      </div>
+    </div>
+
+    <h3>⏳ 扫描进度页（Scanning）</h3>
+    <p>动态进度条 + 实时文字「正在分析第 342 张…」+ 预估剩余时间。每批处理 20 张，可最小化到后台，锁屏不中断。</p>
+
+    <h3>✨ 精选结果页（Results）— 核心页面</h3>
+    <p>3 列瀑布流网格，默认全选（蓝色对勾），底部固定「保存精选」按钮。</p>
+    <table>
+      <thead><tr><th>操作</th><th>行为</th></tr></thead>
+      <tbody>
+        <tr><td>单张点击</td><td>全屏预览（支持左右滑动切换）</td></tr>
+        <tr><td>单张长按</td><td>弹出「移除」选项</td></tr>
+        <tr><td>右上角切换 Tab</td><td>「AI 精选」/ 「全部照片」</td></tr>
+        <tr><td>「全部照片」Tab</td><td>展示原始 1000 张，可点击添加到精选</td></tr>
+        <tr><td>顶部「重新扫描」</td><td>清空结果，重新开始</td></tr>
+      </tbody>
+    </table>
+
+    <h3>🎉 完成页（Done）</h3>
+    <p>
+      <span class="chip">📂 在系统相册查看</span>
+      <span class="chip">📤 分享给家人（系统分享面板）</span>
+      <span class="chip">🔄 重新扫描</span>
+    </p>
+  </div>
+
+  <!-- ══ 六、数据模型 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">💾</div>
+      <div>
+        <div class="section-title">数据模型</div>
+        <span class="section-num">SECTION 06</span>
+      </div>
+    </div>
+    <p>使用 <strong>AsyncStorage</strong> 本地存储上次扫描结果：</p>
+    <pre><span style="color:#90CDF4">interface</span> <span style="color:#F6E05E">ScanResult</span> {
+  scannedAt:     <span style="color:#68D391">number</span>;           <span style="color:#718096">// 时间戳</span>
+  totalScanned:  <span style="color:#68D391">number</span>;           <span style="color:#718096">// 扫描总数</span>
+  candidates:    <span style="color:#F6E05E">PhotoCandidate</span>[];  <span style="color:#718096">// AI 候选照片</span>
+  selected:      <span style="color:#68D391">string</span>[];         <span style="color:#718096">// 用户最终选中的 localIdentifier</span>
+}
+
+<span style="color:#90CDF4">interface</span> <span style="color:#F6E05E">PhotoCandidate</span> {
+  localIdentifier: <span style="color:#68D391">string</span>;   <span style="color:#718096">// PhotoKit 唯一 ID</span>
+  uri:             <span style="color:#68D391">string</span>;   <span style="color:#718096">// 缩略图 URI</span>
+  creationTime:    <span style="color:#68D391">number</span>;   <span style="color:#718096">// 拍摄时间</span>
+  scores: {
+    sharpness:       <span style="color:#68D391">number</span>; <span style="color:#718096">// 清晰度 0~1</span>
+    babyProbability: <span style="color:#68D391">number</span>; <span style="color:#718096">// 婴儿概率 0~1</span>
+    exposure:        <span style="color:#68D391">number</span>; <span style="color:#718096">// 曝光评分 0~1</span>
+    composition:     <span style="color:#68D391">number</span>; <span style="color:#718096">// 构图评分 0~1</span>
+    total:           <span style="color:#68D391">number</span>; <span style="color:#718096">// 综合得分 0~1</span>
+  };
+}</pre>
+  </div>
+
+  <!-- ══ 七、用户流程 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🗺</div>
+      <div>
+        <div class="section-title">用户流程总览</div>
+        <span class="section-num">SECTION 07</span>
+      </div>
+    </div>
+    <pre>启动 App
+  └─> 首次打开 → 授权引导页
+        ├─> 全部授权 → 扫描进度页（自动扫描最近1000张）
+        └─> 部分授权 → 系统选择器 → 扫描进度页
+  └─> 再次打开（有历史）→ 首页（可查看上次结果或重新扫描）
+
+扫描完成 → 精选结果页
+  ├─> 移除误判（长按 → 移除）
+  ├─> 补充漏选（切换「全部照片」Tab → 点击添加）
+  └─> 确认 → 「保存精选」→ 完成页
+
+完成页
+  ├─> 查看系统相册
+  ├─> 分享给家人
+  └─> 重新扫描</pre>
+  </div>
+
+  <!-- ══ 八、MVP 范围 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🚫</div>
+      <div>
+        <div class="section-title">MVP 范围 — V1 明确不做</div>
+        <span class="section-num">SECTION 08</span>
+      </div>
+    </div>
+    <p>以下功能 V1 明确不做，避免范围蔓延：</p>
+    <div class="not-in-scope">
+      <span class="scope-tag">视频筛选</span>
+      <span class="scope-tag">多宝宝区分</span>
+      <span class="scope-tag">自定义评分权重</span>
+      <span class="scope-tag">云端备份 / iCloud 同步</span>
+      <span class="scope-tag">Android 版本</span>
+      <span class="scope-tag">广告 / 付费墙</span>
+      <span class="scope-tag">社交分享到微信/微博</span>
+    </div>
+  </div>
+
+  <!-- ══ 九、App Store ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🍎</div>
+      <div>
+        <div class="section-title">App Store 上架要点</div>
+        <span class="section-num">SECTION 09</span>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>项目</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>应用分类</td><td>照片与视频</td></tr>
+        <tr><td>目标用户年龄</td><td>4+（无不适内容）</td></tr>
+        <tr><td>隐私权限说明</td><td>相册访问：用于扫描和保存宝宝照片，<strong>所有处理均在本地完成</strong></td></tr>
+        <tr><td>数据收集</td><td>不收集任何用户数据，不联网传输照片</td></tr>
+        <tr><td>审核重点</td><td><code>NSPhotoLibraryUsageDescription</code> 描述需清晰详细</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ 十、开发里程碑 ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🚀</div>
+      <div>
+        <div class="section-title">开发里程碑（约 5 周）</div>
+        <span class="section-num">SECTION 10</span>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">M1</div>
+        <div class="tl-body">
+          <div class="tl-title">项目初始化 + 相册授权 + 读取照片列表</div>
+          <div class="tl-time">1 周</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">M2</div>
+        <div class="tl-body">
+          <div class="tl-title">ML Kit 集成 + 评分算法 + 扫描进度页</div>
+          <div class="tl-time">1.5 周</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">M3</div>
+        <div class="tl-body">
+          <div class="tl-title">精选结果页（网格、手动增删）</div>
+          <div class="tl-time">1 周</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">M4</div>
+        <div class="tl-body">
+          <div class="tl-title">保存相册 + 完成页 + 全流程打通</div>
+          <div class="tl-time">0.5 周</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">M5</div>
+        <div class="tl-body">
+          <div class="tl-title">UI 打磨 + 真机测试 + App Store 提交</div>
+          <div class="tl-time">1 周</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  宝宝精选 · Baby Photo Selector · V1.0 MVP &nbsp;|&nbsp;
+  <a href="https://github.com/oyzh888/baby-photo-selector" target="_blank">GitHub 仓库</a>
+  &nbsp;|&nbsp; 文档日期 2026-06-01
+</footer>
+
+</body>
+</html>
