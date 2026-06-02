@@ -37,10 +37,14 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Init EAS project (writes projectId into app.json)
+      - name: Init EAS project
         run: eas init --non-interactive --force
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Write ASC API Key file
+        run: |
+          echo "${{ secrets.EXPO_ASC_API_KEY }}" > /tmp/AuthKey.p8
 
       - name: Build iOS with EAS
         run: |
@@ -51,8 +55,9 @@ jobs:
             --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_APPLE_ID: ${{ secrets.EXPO_APPLE_ID }}
-          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.EXPO_APPLE_APP_SPECIFIC_PASSWORD }}
+          EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
+          EXPO_ASC_API_ISSUER_ID: ${{ secrets.EXPO_ASC_API_ISSUER_ID }}
+          EXPO_ASC_API_KEY_PATH: /tmp/AuthKey.p8
 
       - name: Build queued
         run: |
