@@ -61,24 +61,14 @@ jobs:
       - name: Write ASC API Key
         run: echo "${{ secrets.EXPO_ASC_API_KEY_ADMIN }}" > /tmp/AuthKey_admin.p8
 
-      - name: Build iOS with EAS (local credentials)
+      - name: Build iOS and auto-submit to TestFlight
         run: |
           eas build \
             --platform ios \
             --profile ${{ github.event.inputs.profile }} \
             --non-interactive \
-            --wait
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Submit to TestFlight
-        if: ${{ github.event.inputs.submit == 'true' }}
-        run: |
-          eas submit \
-            --platform ios \
-            --profile production \
-            --latest \
-            --non-interactive
+            --wait \
+            ${{ github.event.inputs.submit == 'true' && '--auto-submit' || '' }}
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID_ADMIN }}
