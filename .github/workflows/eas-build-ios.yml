@@ -11,6 +11,14 @@ on:
         options:
           - preview
           - production
+      submit:
+        description: 'Submit to TestFlight after build?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 jobs:
   build:
@@ -50,17 +58,29 @@ jobs:
           echo "✅ Credentials decoded"
           openssl pkcs12 -in certs/distribution.p12 -passin pass:easbuild -nokeys 2>/dev/null | grep subject
 
+      - name: Write ASC API Key
+        run: echo "${{ secrets.EXPO_ASC_API_KEY_ADMIN }}" > /tmp/AuthKey_admin.p8
+
       - name: Build iOS with EAS (local credentials)
         run: |
           eas build \
             --platform ios \
             --profile ${{ github.event.inputs.profile }} \
             --non-interactive \
-            --no-wait
+            --wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build queued
+      - name: Submit to TestFlight
+        if: ${{ github.event.inputs.submit == 'true' }}
         run: |
-          echo "✅ iOS build queued on EAS!"
-          echo "Monitor: https://expo.dev/accounts/jackshuhui/projects/baby-photo-selector/builds"
+          eas submit \
+            --platform ios \
+            --profile production \
+            --latest \
+            --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID_ADMIN }}
+          EXPO_ASC_API_ISSUER_ID: ${{ secrets.EXPO_ASC_API_ISSUER_ID }}
+          EXPO_ASC_API_KEY_PATH: /tmp/AuthKey_admin.p8
