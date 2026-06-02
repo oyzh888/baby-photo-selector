@@ -54,3 +54,6 @@ expo-env.d.ts
 
 # Superpowers skills framework
 .superpowers/
+
+# iOS signing credentials (decoded at CI time, never committed)
+certs/

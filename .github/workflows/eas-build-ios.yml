@@ -42,12 +42,13 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Decode local credentials
+      - name: Decode local credentials into project directory
         run: |
-          echo "${{ secrets.IOS_DIST_P12_BASE64 }}" | base64 -d > /tmp/distribution.p12
-          echo "${{ secrets.IOS_PROFILE_BASE64 }}" | base64 -d > /tmp/app_store.mobileprovision
+          mkdir -p certs
+          echo "${{ secrets.IOS_DIST_P12_BASE64 }}" | base64 -d > certs/distribution.p12
+          echo "${{ secrets.IOS_PROFILE_BASE64 }}" | base64 -d > certs/app_store.mobileprovision
           echo "✅ Credentials decoded"
-          openssl pkcs12 -in /tmp/distribution.p12 -passin pass:easbuild -nokeys 2>/dev/null | grep subject
+          openssl pkcs12 -in certs/distribution.p12 -passin pass:easbuild -nokeys 2>/dev/null | grep subject
 
       - name: Build iOS with EAS (local credentials)
         run: |
