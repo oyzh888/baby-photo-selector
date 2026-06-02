@@ -42,11 +42,14 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Write ASC API Key file
+      - name: Decode local credentials
         run: |
-          echo "${{ secrets.EXPO_ASC_API_KEY }}" > /tmp/AuthKey.p8
+          echo "${{ secrets.IOS_DIST_P12_BASE64 }}" | base64 -d > /tmp/distribution.p12
+          echo "${{ secrets.IOS_PROFILE_BASE64 }}" | base64 -d > /tmp/app_store.mobileprovision
+          echo "✅ Credentials decoded"
+          openssl pkcs12 -in /tmp/distribution.p12 -passin pass:easbuild -nokeys 2>/dev/null | grep subject
 
-      - name: Build iOS with EAS
+      - name: Build iOS with EAS (local credentials)
         run: |
           eas build \
             --platform ios \
@@ -55,11 +58,8 @@ jobs:
             --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
-          EXPO_ASC_API_ISSUER_ID: ${{ secrets.EXPO_ASC_API_ISSUER_ID }}
-          EXPO_ASC_API_KEY_PATH: /tmp/AuthKey.p8
 
       - name: Build queued
         run: |
           echo "✅ iOS build queued on EAS!"
-          echo "Monitor at: https://expo.dev/accounts/jackshuhui/projects/baby-photo-selector/builds"
+          echo "Monitor: https://expo.dev/accounts/jackshuhui/projects/baby-photo-selector/builds"
